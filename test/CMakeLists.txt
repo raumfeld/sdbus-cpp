@@ -27,6 +27,8 @@ add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/googletest-src
     ${CMAKE_CURRENT_BINARY_DIR}/googletest-build
     EXCLUDE_FROM_ALL)
 
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/tmp")
+
 #-------------------------------
 # SOURCE FILES CONFIGURATION
 #-------------------------------
