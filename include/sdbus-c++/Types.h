@@ -157,6 +157,10 @@ namespace sdbus {
         ObjectPath(std::string path)
             : std::string(std::move(path))
         {}
+        ObjectPath(const ObjectPath& o): std::string(o)
+        {}
+        ObjectPath(ObjectPath&& o): std::string(std::move(o))
+        {}
         using std::string::operator=;
     };
 
