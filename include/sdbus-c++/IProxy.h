@@ -38,6 +38,7 @@ namespace sdbus {
     class MethodCall;
     class MethodReply;
     class IConnection;
+    class PendingCall;
 }
 
 namespace sdbus {
@@ -117,13 +118,13 @@ namespace sdbus {
          *
          * @throws sdbus::Error in case of failure
          */
-        virtual void callMethod(const MethodCall& message, async_reply_handler asyncReplyCallback, uint64_t timeout = 0) = 0;
+        virtual PendingCall callMethod(const MethodCall& message, async_reply_handler asyncReplyCallback, uint64_t timeout = 0) = 0;
 
         /*!
          * @copydoc IProxy::callMethod(const MethodCall&,async_reply_handler,uint64_t)
          */
         template <typename _Rep, typename _Period>
-        void callMethod(const MethodCall& message, async_reply_handler asyncReplyCallback, const std::chrono::duration<_Rep, _Period>& timeout);
+        PendingCall callMethod(const MethodCall& message, async_reply_handler asyncReplyCallback, const std::chrono::duration<_Rep, _Period>& timeout);
 
         /*!
          * @brief Registers a handler for the desired signal emitted by the proxied D-Bus object
@@ -273,10 +274,10 @@ namespace sdbus {
     }
 
     template <typename _Rep, typename _Period>
-    inline void IProxy::callMethod(const MethodCall& message, async_reply_handler asyncReplyCallback, const std::chrono::duration<_Rep, _Period>& timeout)
+    inline PendingCall IProxy::callMethod(const MethodCall& message, async_reply_handler asyncReplyCallback, const std::chrono::duration<_Rep, _Period>& timeout)
     {
         auto microsecs = std::chrono::duration_cast<std::chrono::microseconds>(timeout);
-        callMethod(message, std::move(asyncReplyCallback), microsecs.count());
+        return callMethod(message, std::move(asyncReplyCallback), microsecs.count());
     }
 
     inline MethodInvoker IProxy::callMethod(const std::string& methodName)
