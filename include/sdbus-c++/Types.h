@@ -155,9 +155,12 @@ namespace sdbus {
         using std::string::string;
         ObjectPath() = default; // Fixes gcc 6.3 error (default c-tor is not imported in above using declaration)
         ObjectPath(const ObjectPath&) = default; // Fixes gcc 8.3 error (deleted copy constructor)
+        ObjectPath(ObjectPath&&)      = default;
         ObjectPath(std::string path)
             : std::string(std::move(path))
         {}
+        ObjectPath& operator=(const ObjectPath&) = default;
+        ObjectPath& operator=(ObjectPath&&)      = default;
         using std::string::operator=;
     };
 
