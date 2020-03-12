@@ -152,12 +152,16 @@ namespace sdbus {
     class ObjectPath : public std::string
     {
     public:
-        using std::string::string;
-        ObjectPath() = default; // Fixes gcc 6.3 error (default c-tor is not imported in above using declaration)
-        ObjectPath(std::string path)
-            : std::string(std::move(path))
-        {}
-        using std::string::operator=;
+      using std::string::string;
+      ObjectPath(std::string path)
+              : std::string(std::move(path))
+      {}
+      ObjectPath() = default; // Fixes gcc 6.3 error (default c-tor is not imported in above using declaration)
+      ObjectPath(const ObjectPath&) = default;
+      ObjectPath(ObjectPath&&)      = default;
+      ObjectPath& operator=(const ObjectPath&) = default;
+      ObjectPath& operator=(ObjectPath&&)      = default;
+      using std::string::operator=;
     };
 
     /********************************************//**
