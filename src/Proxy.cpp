@@ -216,16 +216,19 @@ int Proxy::sdbus_async_reply_handler(sd_bus_message *sdbusMessage, void *userDat
     auto* asyncCallData = static_cast<AsyncCalls::CallData*>(userData);
     assert(asyncCallData != nullptr);
     assert(asyncCallData->callback);
+    const auto hasSlot = asyncCallData->slot.get() != nullptr;
 
     SCOPE_EXIT
     {
-        asyncCallData->lock.clear();
-
         // Slot may be null if we're doing blocking synchronous call implemented by means of asynchronous call,
         // because in that case the call data is still alive on the stack, we don't need to manage it separately.
-        if (asyncCallData->slot)
-            asyncCallData->proxy.pendingAsyncCalls_.removeCall(asyncCallData->slot.get());
-
+        // NOTE: We have to check our local hasSlot instead of accessing asyncCallData->slot here because if we are
+        // doing a blocking synchronous call, asyncCallData might already be dead at this point.
+        if (hasSlot)
+        {
+          asyncCallData->lock.clear();
+          asyncCallData->proxy.pendingAsyncCalls_.removeCall(asyncCallData->slot.get());
+        }
     };
 
     auto message = Message::Factory::create<MethodReply>(sdbusMessage, &asyncCallData->proxy.connection_->getSdBusInterface());
