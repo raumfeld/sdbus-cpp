@@ -56,8 +56,17 @@ int SdBus::sd_bus_send(sd_bus *bus, sd_bus_message *m, uint64_t *cookie)
 int SdBus::sd_bus_call(sd_bus *bus, sd_bus_message *m, uint64_t usec, sd_bus_error *ret_error, sd_bus_message **reply)
 {
     std::lock_guard lock(sdbusMutex_);
-
-    return ::sd_bus_call(bus, m, usec, ret_error, reply);
+    if (!bus)
+      bus = ::sd_bus_message_get_bus(m);
+    auto r = ::sd_bus_call(bus, m, usec, ret_error, reply);
+    if (r < 0)
+        return r;
+    uint64_t read = 0, write = 0;
+    sd_bus_get_n_queued_read(bus, &read);
+    sd_bus_get_n_queued_write(bus, &write);
+    if ((read + write) > 0)
+        notifyEventFdLocked(bus);
+    return r;
 }
 
 int SdBus::sd_bus_call_async(sd_bus *bus, sd_bus_slot **slot, sd_bus_message *m, sd_bus_message_handler_t callback, void *userdata, uint64_t usec)
