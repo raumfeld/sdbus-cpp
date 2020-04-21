@@ -112,6 +112,7 @@ target_link_libraries(sdbus-c++-objlib PUBLIC Systemd::Libsystemd)
 add_library(sdbus-c++)
 target_include_directories(sdbus-c++ PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
                                             $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+target_compile_definitions(sdbus-c++ INTERFACE SDBUSCPP_LIBSYSTEMD_VERSION=${LIBSYSTEMD_VERSION})
 set_target_properties(sdbus-c++
                       PROPERTIES PUBLIC_HEADER "${SDBUSCPP_PUBLIC_HDRS}"
                                  VERSION "${SDBUSCPP_VERSION}"
