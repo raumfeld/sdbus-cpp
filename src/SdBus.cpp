@@ -61,11 +61,15 @@ int SdBus::sd_bus_call(sd_bus *bus, sd_bus_message *m, uint64_t usec, sd_bus_err
     auto r = ::sd_bus_call(bus, m, usec, ret_error, reply);
     if (r < 0)
         return r;
+#if LIBSYSTEMD_VERSION > 237
     uint64_t read = 0, write = 0;
-    sd_bus_get_n_queued_read(bus, &read);
-    sd_bus_get_n_queued_write(bus, &write);
+    ::sd_bus_get_n_queued_read(bus, &read);
+    ::sd_bus_get_n_queued_write(bus, &write);
     if ((read + write) > 0)
         notifyEventFdLocked(bus);
+#else
+    notifyEventFdLocked(bus);
+#endif
     return r;
 }
 
