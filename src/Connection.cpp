@@ -194,8 +194,11 @@ SlotPtr Connection::addObjectVTable( const std::string& objectPath
 PlainMessage Connection::createPlainMessage() const
 {
     sd_bus_message* sdbusMsg{};
-
+#if LIBSYSTEMD_VERSION != 245
     auto r = iface_->sd_bus_message_new(bus_.get(), &sdbusMsg, _SD_BUS_MESSAGE_TYPE_INVALID);
+#else
+    auto r = iface_->sd_bus_message_new(bus_.get(), &sdbusMsg, SD_BUS_MESSAGE_METHOD_CALL);
+#endif
 
     SDBUS_THROW_ERROR_IF(r < 0, "Failed to create a plain message", -r);
 
